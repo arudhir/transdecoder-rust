@@ -2,51 +2,30 @@ use crate::types::{ORF, ORFType, Strand};
 use std::collections::HashMap;  // I can't find the codon table in rust-bio??
 
 pub fn make_codon_table() -> HashMap<&'static str, char> {
-        [
-        // Phenylalanine
-        ("TTT", 'F'), ("TTC", 'F'),
-        // Leucine
-        ("TTA", 'L'), ("TTG", 'L'), ("CTT", 'L'), ("CTC", 'L'), ("CTA", 'L'), ("CTG", 'L'),
-        // Isoleucine
-        ("ATT", 'I'), ("ATC", 'I'), ("ATA", 'I'),
-        // Methionine (start)
-        ("ATG", 'M'),
-        // Valine
-        ("GTT", 'V'), ("GTC", 'V'), ("GTA", 'V'), ("GTG", 'V'),
-        // Serine
-        ("TCT", 'S'), ("TCC", 'S'), ("TCA", 'S'), ("TCG", 'S'),
+        [        
+        ("TTT", 'F'), ("TTC", 'F'),  
+        ("TTA", 'L'), ("TTG", 'L'), ("CTT", 'L'), ("CTC", 'L'), ("CTA", 'L'), ("CTG", 'L'),  
+        ("ATT", 'I'), ("ATC", 'I'), ("ATA", 'I'),  
+        ("ATG", 'M'),  
+        ("GTT", 'V'), ("GTC", 'V'), ("GTA", 'V'), ("GTG", 'V'),  
+        ("TCT", 'S'), ("TCC", 'S'), ("TCA", 'S'), ("TCG", 'S'),  
         ("AGT", 'S'), ("AGC", 'S'),
-        // Proline
-        ("CCT", 'P'), ("CCC", 'P'), ("CCA", 'P'), ("CCG", 'P'),
-        // Threonine
-        ("ACT", 'T'), ("ACC", 'T'), ("ACA", 'T'), ("ACG", 'T'),
-        // Alanine
-        ("GCT", 'A'), ("GCC", 'A'), ("GCA", 'A'), ("GCG", 'A'),
-        // Tyrosine
-        ("TAT", 'Y'), ("TAC", 'Y'),
-        // Histidine
-        ("CAT", 'H'), ("CAC", 'H'),
-        // Glutamine
-        ("CAA", 'Q'), ("CAG", 'Q'),
-        // Asparagine
-        ("AAT", 'N'), ("AAC", 'N'),
-        // Lysine
-        ("AAA", 'K'), ("AAG", 'K'),
-        // Aspartic Acid
-        ("GAT", 'D'), ("GAC", 'D'),
-        // Glutamic Acid
-        ("GAA", 'E'), ("GAG", 'E'),
-        // Cysteine
-        ("TGT", 'C'), ("TGC", 'C'),
-        // Tryptophan
-        ("TGG", 'W'),
-        // Arginine
-        ("CGT", 'R'), ("CGC", 'R'), ("CGA", 'R'), ("CGG", 'R'),
+        ("CCT", 'P'), ("CCC", 'P'), ("CCA", 'P'), ("CCG", 'P'),  
+        ("ACT", 'T'), ("ACC", 'T'), ("ACA", 'T'), ("ACG", 'T'),  
+        ("GCT", 'A'), ("GCC", 'A'), ("GCA", 'A'), ("GCG", 'A'),  
+        ("TAT", 'Y'), ("TAC", 'Y'),  
+        ("CAT", 'H'), ("CAC", 'H'),  
+        ("CAA", 'Q'), ("CAG", 'Q'),  
+        ("AAT", 'N'), ("AAC", 'N'),  
+        ("AAA", 'K'), ("AAG", 'K'),  
+        ("GAT", 'D'), ("GAC", 'D'),  
+        ("GAA", 'E'), ("GAG", 'E'),  
+        ("TGT", 'C'), ("TGC", 'C'),  
+        ("TGG", 'W'),  
+        ("CGT", 'R'), ("CGC", 'R'), ("CGA", 'R'), ("CGG", 'R'),  
         ("AGA", 'R'), ("AGG", 'R'),
-        // Glycine
-        ("GGT", 'G'), ("GGC", 'G'), ("GGA", 'G'), ("GGG", 'G'),
-        // Stop codons
-        ("TAA", '*'), ("TAG", '*'), ("TGA", '*'),
+        ("GGT", 'G'), ("GGC", 'G'), ("GGA", 'G'), ("GGG", 'G'),  
+        ("TAA", '*'), ("TAG", '*'), ("TGA", '*'),  
     ]
     .into_iter()
     .collect()  // No ; means that we're returning this
@@ -114,7 +93,17 @@ fn classify_orf(orf: &str) -> ORFType {
 }
 
 fn reverse_complement(seq: &str) -> String {
-    return String::new();
+    let rev_seq = seq.chars().rev().collect::<String>();
+    let rev_comp: String = rev_seq.chars().map(|c| match c {  // Similar-ish to a lambda function
+                                                              // in Python
+        'A' => 'T',  // Single quotes makes it a char literal, double quotes would make it a string
+        'T' => 'A',
+        'C' => 'G',
+        'G' => 'C',
+        _ => 'N'    // match requires all cases to be accounted for
+    }).collect();
+    println!("{} --> {}", seq, rev_comp);
+    return rev_comp;
 }
 
 #[cfg(test)]
@@ -140,5 +129,12 @@ mod tests {
         let seq = "ATGAAATGAA".into();  // 10 nts, should drop the last one
         let aa_str = translate(seq);
         assert_eq!(aa_str, "MK*");
+    }
+
+    #[test]
+    fn test_reverse_complement() {
+        let seq = "ATGAAATGA".into();
+        let rev_comp = reverse_complement(seq);
+        assert_eq!(rev_comp, "TCATTTCAT");
     }
 }
