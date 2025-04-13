@@ -63,11 +63,13 @@ pub fn find_orfs(seq: &str, strand: Strand) -> Vec<ORF> {
 }
 
 fn is_start(seq: &str) -> bool {
-    return false
+    let start = seq == "ATG";
+    return start
 }
 
 fn is_stop(seq: &str) -> bool {
-    return false
+    let stop = matches!(seq, "TAA" | "TAG" | "TGA");
+    return stop
 }
 
 fn translate(seq: &str) -> String {
@@ -136,5 +138,31 @@ mod tests {
         let seq = "ATGAAATGA".into();
         let rev_comp = reverse_complement(seq);
         assert_eq!(rev_comp, "TCATTTCAT");
+    }
+
+    #[test]
+    fn test_is_start() {
+        let codon = "ATG";
+        assert!(is_start(codon));
+    }
+
+    #[test]
+    fn test_is_start_false() {
+        let codon = "TTG";
+        assert!(!is_start(codon));
+    }
+
+    #[test]
+    fn test_is_stop() {
+        let codons = ["TAA", "TAG", "TGA"];
+        for codon in codons {
+            assert!(is_stop(codon));  // just assert since it's a boolean
+        }
+    }
+
+    #[test]
+    fn test_is_stop_false() {
+        let codon = "ATG";
+        assert!(!is_stop(codon));
     }
 }
